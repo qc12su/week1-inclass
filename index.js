@@ -3,7 +3,7 @@ var fs = require('fs')
 
 function filesMatchNameAndSize(fstate1,fstate2){
 
-    var filesMatch = (fstate2) && (fstate1.size == fstate2.size);
+    var filesMatch = filesMatchName(fstate1,fstate2) && (fstate1.size == fstate2.size);
 
     return filesMatch;
 }
