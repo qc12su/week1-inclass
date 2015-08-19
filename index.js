@@ -1,9 +1,22 @@
 var fs = require('fs')
 
 
+function captureDirectoryState(directoryInfo){
+    var state = {};
+
+    var fileList = directoryInfo.fileList;
+    var path = directoryInfo.path;
+
+    for(var i = 0; i < fileList.length; i++){
+        var fileName = fileList[i];
+        var data = fs.statSync(path + "/" + fileName);
+        state[fileName] = data;
+    }
+
+    return state;
+}
+
 function compareDirectories(directoryInfo1, directoryInfo2){
-    var state1 = {};
-    var state2 = {};
 
     var fileList1 = directoryInfo1.fileList;
     var fileList2 = directoryInfo2.fileList;
@@ -23,17 +36,9 @@ function compareDirectories(directoryInfo1, directoryInfo2){
     }
 
 
-    for(var i = 0; i < fileList1.length; i++){
-        var fileName = fileList1[i];
-        var data = fs.statSync(path1 + "/" + fileName);
-        state1[fileName] = data;
-    }
+    var state1 = captureDirectoryState(directoryInfo1);
+    var state2 = captureDirectoryState(directoryInfo2);
 
-    for(var i = 0; i < fileList2.length; i++){
-        var fileName = fileList2[i];
-        var data = fs.statSync(path2 + "/" + fileName);
-        state2[fileName] = data;
-    }
 
     var directoriesMatch = state1.length === state2.length;
     if(directoriesMatch){
