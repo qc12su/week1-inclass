@@ -30,7 +30,7 @@ test({name:"Sync Module"}, function(tester) {
                 var rslt = sync.compare(directory1, directory2, sync.filesMatchName);
                 return rslt.syncToSrc.length === 1 && rslt.syncToSrc[0] === "test2.txt";
             },
-            expectedValue: false,
+            expectedValue: true,
             msg: "The src should need test2.txt sync'd to it"
         }
     ).expectThat(
