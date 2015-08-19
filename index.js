@@ -80,21 +80,43 @@ function getDirectoryInfo(path){
     }
 }
 
+var testNumber = 1;
+function expectThat(test){
+    var check = test.check;
+    var expectedValue = test.expectedValue;
+    var msg = test.msg;
+
+    if(check() === expectedValue){
+        console.log("Test "+testNumber+" passed");
+    }
+    else {
+        console.log("Test "+testNumber+" failed");
+        console.log("[\n\t"+msg+"\n]");
+    }
+
+    testNumber++;
+}
+
 var directoryState1 = getDirectoryInfo("./test-data/folder1");
 var directoryState2 = getDirectoryInfo("./test-data/folder2");
 
-var match = compareDirectories(directoryState1, directoryState2, filesMatchNameAndSize);
-if(!match){
-    console.log("Test passed");
-}
-else {
-    console.log("WTF?")
-}
+expectThat(
+    {
+        check:function(){
+            return compareDirectories(directoryState1,directoryState2,filesMatchNameAndSize);
+        },
+        expectedValue:false,
+        msg:"Directories with files that are the same name but different sizes shouldn't match"
+    }
+);
 
-var match2 = compareDirectories(directoryState1, directoryState2, filesMatchName);
-if(match2){
-    console.log("Test 2 passed");
-}
-else {
-    console.log("WTF?")
-}
+expectThat(
+    {
+        check:function(){
+            return compareDirectories(directoryState1,directoryState2,filesMatchName);
+        },
+        expectedValue:false,
+        msg:"Directories with files that are the same name but different sizes should match"
+    }
+);
+
