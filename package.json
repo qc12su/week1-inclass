@@ -1,0 +1,11 @@
+{
+  "name": "dropbox",
+  "version": "0.0.1",
+  "description": "A Dropbox-like app",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_PATH=lib node index.js"
+  },
+  "author": "Jules",
+  "license": "Apache 2"
+}
