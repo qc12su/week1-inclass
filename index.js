@@ -1,6 +1,14 @@
 var fs = require('fs')
 
 
+function filesMatch(fstate1,fstate2){
+
+    var filesMatch = (fstate2) && (fstate1.size == fstate2.size);
+
+    return filesMatch;
+}
+
+
 function captureDirectoryState(directoryInfo){
     var state = {};
 
@@ -46,11 +54,7 @@ function compareDirectories(directoryInfo1, directoryInfo2){
             var fstate1 = state1[name];
             var fstate2 = state2[name];
 
-            if(!fstate2){
-                directoriesMatch = false;
-                break;
-            }
-            else if(fstate1.size != fstate2.size){
+            if(!filesMatch(fstate1,fstate2)) {
                 directoriesMatch = false;
                 break;
             }
