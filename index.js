@@ -36,16 +36,23 @@ function captureDirectoryState(directoryInfo){
 function compareDirectoriesOneWay(state1,state2,matcher){
     var directoriesMatch = true;
 
+    var needsCopyingToOtherDirectory = [];
+
     for(var name in state1){
         var fstate1 = state1[name];
         var fstate2 = state2[name];
 
         if(!matcher(fstate1,fstate2)) {
-            directoriesMatch = false;
-            break;
+
+            var lastModified1 = fstate1.ctime.getTime();
+            var lastModified2 = (fstate2)? fstate2.ctime.getTime() : -1;
+
+            if(lastModified1 > lastModified2){
+                needsCopyingToOtherDirectory.push(name);
+            }
         }
     }
-    return directoriesMatch
+    return needsCopyingToOtherDirectory;
 }
 
 function compareDirectories(directoryInfo1, directoryInfo2, matcher){
@@ -72,14 +79,19 @@ function compareDirectories(directoryInfo1, directoryInfo2, matcher){
     var state2 = captureDirectoryState(directoryInfo2);
 
 
-    var directoriesMatch = state1.length === state2.length;
-    if(directoriesMatch){
-        directoriesMatch =
-            compareDirectoriesOneWay(state1,state2,matcher) &&
-            compareDirectoriesOneWay(state2,state1,matcher);
-    }
+    var syncTo2 =
+            compareDirectoriesOneWay(state1,state2,matcher);
 
-    return directoriesMatch;
+    var syncTo1 =
+            compareDirectoriesOneWay(state2,state1,matcher);
+
+    return {
+        syncToSrc:syncTo1,
+        syncToTrg:syncTo2,
+        directoriesMatch:function(){
+            return syncTo1.length === 0 && syncTo2.length === 0;
+        }
+    };
 }
 
 function getDirectoryInfo(path){
@@ -99,7 +111,7 @@ var directoryState2 = getDirectoryInfo("./test-data/folder2");
 expectThat(
     {
         check:function(){
-            return compareDirectories(directoryState1,directoryState2,filesMatchNameAndSize);
+            return compareDirectories(directoryState1,directoryState2,filesMatchNameAndSize).directoriesMatch();
         },
         expectedValue:false,
         msg:"Directories with files that are the same name but different sizes shouldn't match"
@@ -109,11 +121,21 @@ expectThat(
 expectThat(
     {
         check:function(){
-            return compareDirectories(directoryState1,directoryState2,filesMatchName);
+            return compareDirectories(directoryState1,directoryState2,filesMatchName).directoriesMatch();
         },
         expectedValue:false,
         msg:"Directories with files that are the same name but different sizes should match"
     }
 );
 
+expectThat(
+    {
+        check:function(){
+            var rslt = compareDirectories(directoryState1,directoryState2,filesMatchName);
+            return rslt.syncToSrc.length === 1 && rslt.syncToSrc[0] === "test2.txt";
+        },
+        expectedValue:true,
+        msg:"The src should need test2.txt sync'd to it"
+    }
+)
 
