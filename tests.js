@@ -3,13 +3,13 @@ var _ = require('lodash')
 var expectThat = require('./lib/test/expect').expectThat;
 var sync = require('./lib/sync/sync');
 
-var directoryState1 = sync.getDirectoryInfo("./test-data/folder1");
-var directoryState2 = sync.getDirectoryInfo("./test-data/folder2");
+var directory1 = "./test-data/folder1";
+var directory2 = "./test-data/folder2";
 
 expectThat(
     {
         check:function(){
-            return sync.compareDirectories(directoryState1,directoryState2,sync.filesMatchNameAndSize).directoriesMatch();
+            return sync.compare(directory1,directory2,sync.filesMatchNameAndSize).directoriesMatch();
         },
         expectedValue:false,
         msg:"Directories with files that are the same name but different sizes shouldn't match"
@@ -19,7 +19,7 @@ expectThat(
 expectThat(
     {
         check:function(){
-            return sync.compareDirectories(directoryState1,directoryState2,sync.filesMatchName).directoriesMatch();
+            return sync.compare(directory1,directory2,sync.filesMatchName).directoriesMatch();
         },
         expectedValue:false,
         msg:"Directories with files that are the same name but different sizes should match"
@@ -29,7 +29,7 @@ expectThat(
 expectThat(
     {
         check:function(){
-            var rslt = sync.compareDirectories(directoryState1,directoryState2,sync.filesMatchName);
+            var rslt = sync.compare(directory1,directory2,sync.filesMatchName);
             return rslt.syncToSrc.length === 1 && rslt.syncToSrc[0] === "test2.txt";
         },
         expectedValue:true,
@@ -40,7 +40,7 @@ expectThat(
 expectThat(
     {
         check:function(){
-            return sync.compareDirectories(directoryState1,directoryState2,sync.filesMatchNameAndSize);
+            return sync.compare(directory1,directory2,sync.filesMatchNameAndSize);
         },
         expectedValue:function(rslt){
             var hasTest = _.contains(rslt.syncToSrc, "test.txt");
