@@ -24,7 +24,7 @@ function captureDirectoryState(directoryInfo){
     return state;
 }
 
-function compareDirectories(directoryInfo1, directoryInfo2){
+function compareDirectories(directoryInfo1, directoryInfo2, matcher){
 
     var fileList1 = directoryInfo1.fileList;
     var fileList2 = directoryInfo2.fileList;
@@ -54,7 +54,7 @@ function compareDirectories(directoryInfo1, directoryInfo2){
             var fstate1 = state1[name];
             var fstate2 = state2[name];
 
-            if(!filesMatch(fstate1,fstate2)) {
+            if(!matcher(fstate1,fstate2)) {
                 directoriesMatch = false;
                 break;
             }
@@ -76,7 +76,7 @@ function getDirectoryInfo(path){
 var directoryState1 = getDirectoryInfo("./test-data");
 var directoryState2 = getDirectoryInfo("./test-data");
 
-var match = compareDirectories(directoryState1, directoryState2);
+var match = compareDirectories(directoryState1, directoryState2, filesMatch);
 if(match){
     console.log("Test passed");
 }
