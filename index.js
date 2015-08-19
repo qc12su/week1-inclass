@@ -36,7 +36,23 @@ function checkForChanges(){
     rslt.srcPath = path1;
     rslt.trgPath = path2;
 
-    var result = writePipeline.exec(rslt);
+    return writePipeline.exec(rslt);
 }
 
-checkForChanges();
+function scheduleChangeCheck(when,repeat){
+    setTimeout(function(){
+        console.log("Checking for changes...");
+        var rslt = checkForChanges().result;
+
+        _.each(rslt.syncToSrc, function(file){
+           console.log(file + " was sync'd to "+rslt.srcPath);
+        });
+        _.each(rslt.syncToTrg, function(file){
+            console.log(file + " was sync'd to "+rslt.trgPath);
+        });
+
+        if(repeat){scheduleChangeCheck(when,repeat)}
+    },when);
+}
+
+scheduleChangeCheck(1000,true);
