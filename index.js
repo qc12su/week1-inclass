@@ -1,9 +1,16 @@
 var fs = require('fs')
 
 
-function filesMatch(fstate1,fstate2){
+function filesMatchNameAndSize(fstate1,fstate2){
 
     var filesMatch = (fstate2) && (fstate1.size == fstate2.size);
+
+    return filesMatch;
+}
+
+function filesMatchName(fstate1,fstate2){
+
+    var filesMatch = (fstate2);
 
     return filesMatch;
 }
@@ -73,12 +80,20 @@ function getDirectoryInfo(path){
     }
 }
 
-var directoryState1 = getDirectoryInfo("./test-data");
-var directoryState2 = getDirectoryInfo("./test-data");
+var directoryState1 = getDirectoryInfo("./test-data/folder1");
+var directoryState2 = getDirectoryInfo("./test-data/folder2");
 
-var match = compareDirectories(directoryState1, directoryState2, filesMatch);
-if(match){
+var match = compareDirectories(directoryState1, directoryState2, filesMatchNameAndSize);
+if(!match){
     console.log("Test passed");
+}
+else {
+    console.log("WTF?")
+}
+
+var match2 = compareDirectories(directoryState1, directoryState2, filesMatchName);
+if(match2){
+    console.log("Test 2 passed");
 }
 else {
     console.log("WTF?")
