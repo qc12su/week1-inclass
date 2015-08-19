@@ -9,6 +9,7 @@
   "author": "Jules",
   "license": "Apache 2",
   "dependencies": {
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "yargs": "^3.19.0"
   }
 }

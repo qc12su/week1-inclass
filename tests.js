@@ -47,7 +47,23 @@ test({name:"Sync Module"}, function(tester) {
             },
             msg: "folder1 should need test2.txt and test.txt sync'd to it, but folder2 shouldn't need anything sync'd"
         }
-    );
+    ).expectThat(
+        {
+            check:function(){
+                return sync.getProtocol("foo://asdf.com?asdf3=2")
+            },
+            expectedValue:"foo",
+            msg: "protocols are parsed correctly from full uris"
+        }
+    ).expectThat(
+        {
+            check:function(){
+                return sync.getProtocol("/foo/bar")
+            },
+            expectedValue:"file",
+            msg: "protocols are defaulted to file if no scheme is present in the uri"
+        }
+    )
 });
 
 
