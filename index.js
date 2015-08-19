@@ -3,13 +3,6 @@ var fs = require('fs')
 
 
 
-function brokenMatcher(fstate1,fstate2){
-
-    var filesMatch = filesMatchName(fstate1,fstate2) && (fstate1.size == fstate2.md5Hash.value);
-
-    return filesMatch;
-}
-
 function filesMatchNameAndSize(fstate1,fstate2){
 
     var filesMatch = filesMatchName(fstate1,fstate2) && (fstate1.size == fstate2.size);
@@ -40,6 +33,21 @@ function captureDirectoryState(directoryInfo){
     return state;
 }
 
+function compareDirectoriesOneWay(state1,state2,matcher){
+    var directoriesMatch = true;
+
+    for(var name in state1){
+        var fstate1 = state1[name];
+        var fstate2 = state2[name];
+
+        if(!matcher(fstate1,fstate2)) {
+            directoriesMatch = false;
+            break;
+        }
+    }
+    return directoriesMatch
+}
+
 function compareDirectories(directoryInfo1, directoryInfo2, matcher){
 
     var fileList1 = directoryInfo1.fileList;
@@ -66,15 +74,9 @@ function compareDirectories(directoryInfo1, directoryInfo2, matcher){
 
     var directoriesMatch = state1.length === state2.length;
     if(directoriesMatch){
-        for(var name in state1){
-            var fstate1 = state1[name];
-            var fstate2 = state2[name];
-
-            if(!matcher(fstate1,fstate2)) {
-                directoriesMatch = false;
-                break;
-            }
-        }
+        directoriesMatch =
+            compareDirectoriesOneWay(state1,state2,matcher) &&
+            compareDirectoriesOneWay(state2,state1,matcher);
     }
 
     return directoriesMatch;
@@ -143,12 +145,4 @@ expectThat(
     }
 );
 
-expectThat(
-    {
-        check:function(){
-            return compareDirectories(directoryState1,directoryState2,brokenMatcher);
-        },
-        expectedValue:false,
-        msg:"We are hoping that the broken matcher fails the test"
-    }
-);
+
