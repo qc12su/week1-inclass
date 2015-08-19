@@ -1,4 +1,5 @@
 var fs = require('fs')
+var _ = require('lodash')
 var expectThat = require('./lib/test/expect').expectThat;
 
 
@@ -139,3 +140,18 @@ expectThat(
     }
 )
 
+expectThat(
+    {
+        check:function(){
+            return compareDirectories(directoryState1,directoryState2,filesMatchNameAndSize);
+        },
+        expectedValue:function(rslt){
+            var hasTest = _.contains(rslt.syncToSrc, "test.txt");
+            var hasTest2 = _.contains(rslt.syncToSrc, "test2.txt");
+            var nothingNeedsSyncingToFolder2 = (rslt.syncToTrg.length == 0);
+
+            return hasTest && hasTest2 && nothingNeedsSyncingToFolder2;
+        },
+        msg:"folder1 should need test2.txt and test.txt sync'd to it, but folder2 shouldn't need anything sync'd"
+    }
+)
