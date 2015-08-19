@@ -1,6 +1,15 @@
 var fs = require('fs')
 
 
+
+
+function brokenMatcher(fstate1,fstate2){
+
+    var filesMatch = filesMatchName(fstate1,fstate2) && (fstate1.size == fstate2.md5Hash.value);
+
+    return filesMatch;
+}
+
 function filesMatchNameAndSize(fstate1,fstate2){
 
     var filesMatch = filesMatchName(fstate1,fstate2) && (fstate1.size == fstate2.size);
@@ -86,8 +95,22 @@ function expectThat(test){
     var expectedValue = test.expectedValue;
     var msg = test.msg;
 
-    if(check() === expectedValue){
+    var exception = null;
+    var actualValue = null;
+
+    try{
+        actualValue = check();
+    }catch(ex){
+        exception = ex;
+    }
+
+    if(!exception && (expectedValue === actualValue)){
         console.log("Test "+testNumber+" passed");
+    }
+    else if(exception){
+        console.log("Test "+testNumber+" failed");
+        console.log("At: "+exception.stack);
+        console.log("[\n\t"+msg+"\n]");
     }
     else {
         console.log("Test "+testNumber+" failed");
@@ -120,3 +143,12 @@ expectThat(
     }
 );
 
+expectThat(
+    {
+        check:function(){
+            return compareDirectories(directoryState1,directoryState2,brokenMatcher);
+        },
+        expectedValue:false,
+        msg:"We are hoping that the broken matcher fails the test"
+    }
+);
