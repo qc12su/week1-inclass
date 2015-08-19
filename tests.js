@@ -2,6 +2,7 @@ var _ = require('lodash')
 
 var expectThat = require('./lib/test/expect').expectThat;
 var sync = require('./lib/sync/sync');
+var Pipeline = require('./lib/sync/pipeline').Pipeline;
 
 var directory1 = "./test-data/folder1";
 var directory2 = "./test-data/folder2";
@@ -48,6 +49,33 @@ expectThat(
             var nothingNeedsSyncingToFolder2 = (rslt.syncToTrg.length == 0);
 
             return hasTest && hasTest2 && nothingNeedsSyncingToFolder2;
+        },
+        msg:"folder1 should need test2.txt and test.txt sync'd to it, but folder2 shouldn't need anything sync'd"
+    }
+)
+
+
+
+var myPipeline = new Pipeline();
+myPipeline.addAction({
+    exec:function(data){
+        return data + 1;
+    }
+});
+
+expectThat(
+    {
+        check:function(){
+            return myPipeline.exec(0);
+        },
+        expectedValue:function(rslt){
+            var hasResult = (rslt.result);
+            var hasHistory = (rslt.history);
+            var resultIs1 = rslt.result === 1;
+            var historyHas2Items = (rslt.history.length === 2);
+            var historyHasCorrectItems = (rslt.history[0] === 0 && rslt.history[1] === 1);
+
+            return hasResult && hasHistory && resultIs1 && historyHas2Items && historyHasCorrectItems;
         },
         msg:"folder1 should need test2.txt and test.txt sync'd to it, but folder2 shouldn't need anything sync'd"
     }
