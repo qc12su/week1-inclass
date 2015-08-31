@@ -9,7 +9,8 @@
   "author": "Jules",
   "license": "Apache 2",
   "dependencies": {
-    "connect": "^3.4.0",
+    "delivery": "0.0.3",
+    "dnode": "^1.2.1",
     "lodash": "^3.10.1",
     "sync-request": "^2.0.1",
     "yargs": "^3.19.0"

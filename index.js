@@ -2,6 +2,7 @@ var _ = require('lodash');
 var fs = require('fs');
 
 var sync = require('./lib/sync/sync');
+var dnodeClient = require("./lib/sync/sync-client");
 var Pipeline = require("./lib/sync/pipeline").Pipeline;
 
 
@@ -11,7 +12,16 @@ writePipeline.addAction({
         _.each(data.syncToSrc, function(toSrc){
             var fromPath = data.trgPath + "/" + toSrc;
             var toPath = data.srcPath + "/" + toSrc;
-            fs.createReadStream(fromPath).pipe(fs.createWriteStream(toPath));
+
+            var srcHandler = sync.getHandler(fromPath);
+            var trgHandler = sync.getHandler(toPath);
+
+            srcHandler.readFile(fromPath,function(base64Data){
+               trgHandler.writeFile(toPath,base64Data,function(){
+                   console.log("Copied "+fromPath+" to "+toPath);
+               })
+            });
+
         });
         return data;
     }
@@ -21,38 +31,45 @@ writePipeline.addAction({
         _.each(data.syncToTrg, function(toTrg){
             var fromPath = data.srcPath + "/" + toTrg;
             var toPath = data.trgPath + "/" + toTrg;
-            fs.createReadStream(fromPath).pipe(fs.createWriteStream(toPath));
+
+            var srcHandler = sync.getHandler(fromPath);
+            var trgHandler = sync.getHandler(toPath);
+
+            srcHandler.readFile(fromPath,function(base64Data){
+                trgHandler.writeFile(toPath,base64Data,function(){
+                    console.log("Copied "+fromPath+" to "+toPath);
+                })
+            });
         });
         return data;
     }
 });
 
 function checkForChanges(){
-    var path1 = "./test-data/folder1";
-    var path2 = "./test-data/folder2";
+    var path1 = "dnode://folder1";
+    var path2 = "file://test-data/folder2";
 
-    var rslt = sync.compare(path1,path2,sync.filesMatchNameAndSize);
+    sync.compare(path1,path2,sync.filesMatchNameAndSize, function(rslt) {
 
-    rslt.srcPath = path1;
-    rslt.trgPath = path2;
+        rslt.srcPath = path1;
+        rslt.trgPath = path2;
 
-    return writePipeline.exec(rslt);
+        writePipeline.exec(rslt);
+    });
 }
 
 function scheduleChangeCheck(when,repeat){
     setTimeout(function(){
         console.log("Checking for changes...");
-        var rslt = checkForChanges().result;
-
-        _.each(rslt.syncToSrc, function(file){
-           console.log(file + " was sync'd to "+rslt.srcPath);
-        });
-        _.each(rslt.syncToTrg, function(file){
-            console.log(file + " was sync'd to "+rslt.trgPath);
-        });
+        checkForChanges();
 
         if(repeat){scheduleChangeCheck(when,repeat)}
     },when);
 }
 
-scheduleChangeCheck(1000,true);
+dnodeClient.connect({}, function(handler){
+    sync.fsHandlers.dnode = handler;
+    scheduleChangeCheck(1000,true);
+});
+
+
