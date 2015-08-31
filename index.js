@@ -6,22 +6,24 @@ var dnodeClient = require("./lib/sync/sync-client");
 var Pipeline = require("./lib/sync/pipeline").Pipeline;
 
 
+var syncFile = function(fromPath,toPath){
+    var srcHandler = sync.getHandler(fromPath);
+    var trgHandler = sync.getHandler(toPath);
+
+    srcHandler.readFile(fromPath,function(base64Data){
+        trgHandler.writeFile(toPath,base64Data,function(){
+            console.log("Copied "+fromPath+" to "+toPath);
+        })
+    });
+}
+
 var writePipeline = new Pipeline();
 writePipeline.addAction({
     exec:function(data){
         _.each(data.syncToSrc, function(toSrc){
             var fromPath = data.trgPath + "/" + toSrc;
             var toPath = data.srcPath + "/" + toSrc;
-
-            var srcHandler = sync.getHandler(fromPath);
-            var trgHandler = sync.getHandler(toPath);
-
-            srcHandler.readFile(fromPath,function(base64Data){
-               trgHandler.writeFile(toPath,base64Data,function(){
-                   console.log("Copied "+fromPath+" to "+toPath);
-               })
-            });
-
+            syncFile(fromPath,toPath);
         });
         return data;
     }
@@ -31,15 +33,7 @@ writePipeline.addAction({
         _.each(data.syncToTrg, function(toTrg){
             var fromPath = data.srcPath + "/" + toTrg;
             var toPath = data.trgPath + "/" + toTrg;
-
-            var srcHandler = sync.getHandler(fromPath);
-            var trgHandler = sync.getHandler(toPath);
-
-            srcHandler.readFile(fromPath,function(base64Data){
-                trgHandler.writeFile(toPath,base64Data,function(){
-                    console.log("Copied "+fromPath+" to "+toPath);
-                })
-            });
+            syncFile(fromPath,toPath);
         });
         return data;
     }
@@ -60,7 +54,6 @@ function checkForChanges(){
 
 function scheduleChangeCheck(when,repeat){
     setTimeout(function(){
-        console.log("Checking for changes...");
         checkForChanges();
 
         if(repeat){scheduleChangeCheck(when,repeat)}
