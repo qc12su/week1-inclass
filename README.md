@@ -121,11 +121,11 @@ dropbox --d1 dnode://test-data/folder1 --d2 file://test-data/folder2
 
 If you checked out a fresh repo, you should immediately see something like:
 ```bash
-Your Machine$ dropbox --d1 dnode://test-data/folder1 --d2 file://test-data/folder2
+dropbox --d1 dnode://test-data/folder1 --d2 file://test-data/folder2
 Connected to Dropbox remote
 Copied file://test-data/folder2/test.txt to dnode://test-data/folder1/test.txt
 Copied file://test-data/folder2/test2.txt to dnode://test-data/folder1/test2.txt
-``
+```
 Whatever files you put into folder1 or folder2 will now be copied to the other folder.
 Changes will also be copied across directories.
 
