@@ -6,6 +6,11 @@
   "scripts": {
     "start": "NODE_PATH=lib node index.js"
   },
+  "bin":
+    {
+      "dropbox": "index.js",
+      "dropbox-server":"lib/sync/sync-server.js"
+    },
   "author": "Jules",
   "license": "Apache 2",
   "dependencies": {
