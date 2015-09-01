@@ -13,6 +13,39 @@ a command line argument starts with "dnode://", then the client uses the server 
 about that folder. If the folder starts with "file://", then the client uses local file operations
 to read/sync the directory.
 
+## Following Along in Class
+
+To help you see how this application was built, the application was incrementally committed to the
+git repo. All of the history of the application was preserved and each important commit was tagged.
+You can checkout the tags to see the state of the application at a certain point by changing to
+the directory with index.js and then running:
+
+[Replace step1 with the step that you want to checkout]
+```bash
+git checkout step1
+```
+
+[Checkout Step 22]
+```bash
+git checkout step22
+```
+
+[See a list of available Steps]
+```bash
+git tag
+```
+
+[Get back to the head so that you can edit it]
+```bash
+git checkout master
+```
+
+[If you edit a Step and need to get back to master]
+```bash
+git stash
+git checkout master
+```
+
 ## Installation
 
 To install the application globally on your machine, run the following as an administrator from
@@ -92,7 +125,7 @@ Your Machine$ dropbox --d1 dnode://test-data/folder1 --d2 file://test-data/folde
 Connected to Dropbox remote
 Copied file://test-data/folder2/test.txt to dnode://test-data/folder1/test.txt
 Copied file://test-data/folder2/test2.txt to dnode://test-data/folder1/test2.txt
-```
+``
 Whatever files you put into folder1 or folder2 will now be copied to the other folder.
 Changes will also be copied across directories.
 
